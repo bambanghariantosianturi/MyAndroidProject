@@ -3,6 +3,7 @@ package com.example.myandroidproject.core.data.source.local
 import androidx.lifecycle.LiveData
 import com.example.myandroidproject.core.data.source.local.entity.DataEntity
 import com.example.myandroidproject.core.data.source.local.room.UserDao
+import io.reactivex.Flowable
 
 class LocalDataSource private constructor(private val userDao: UserDao) {
 
@@ -15,9 +16,25 @@ class LocalDataSource private constructor(private val userDao: UserDao) {
             }
     }
 
-    fun getAllData(): LiveData<List<DataEntity>> = userDao.getAllData()
+    /**
+     * with livedata
+     */
+//    fun getAllData(): LiveData<List<DataEntity>> = userDao.getAllData()
 
+    /**
+     * with rx
+     */
+    fun getAllData(): Flowable<List<DataEntity>>  = userDao.getAllData()
+
+    /**
+     * with livedata
+     */
 //    fun getFavoriteData(): LiveData<List<DataEntity>> = userDao.
+
+    /**
+     * with rx
+     */
+//    fun getFavoriteData(): Flowable<List<DataEntity>> = userDao.updateFavoriteData()
 
     fun insertData(dataList: List<DataEntity>) = userDao.insertData(dataList)
 

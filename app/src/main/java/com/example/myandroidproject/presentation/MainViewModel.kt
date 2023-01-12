@@ -1,6 +1,7 @@
 package com.example.myandroidproject.presentation
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.ViewModel
 import com.example.myandroidproject.core.data.Resource
 import com.example.myandroidproject.core.domain.model.Data
@@ -16,6 +17,6 @@ class MainViewModel(private val dataUseCase: DataUseCase) : ViewModel(), IMainVi
 //    }
 
     override fun getAllData(): LiveData<Resource<List<Data>>> {
-        return dataUseCase.getAllData()
+        return LiveDataReactiveStreams.fromPublisher(dataUseCase.getAllData())
     }
 }

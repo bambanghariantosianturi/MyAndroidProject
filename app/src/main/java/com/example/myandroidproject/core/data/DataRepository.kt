@@ -10,6 +10,9 @@ import com.example.myandroidproject.core.domain.model.Data
 import com.example.myandroidproject.core.domain.repository.IDataRepository
 import com.example.myandroidproject.core.utils.AppExecutors
 import com.example.myandroidproject.core.utils.DataMapper
+import io.reactivex.Flowable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 
 class DataRepository private constructor(
     private val remoteDataSource: RemoteDataSource,
@@ -31,12 +34,13 @@ class DataRepository private constructor(
             }
     }
 
-    override fun getAllData(): LiveData<Resource<List<Data>>> {
+    override fun getAllData(): Flowable<Resource<List<Data>>> {
         return object : NetworkBoundResource<List<Data>, List<DataResponse>>(appExecutors) {
-            override fun loadFromDB(): LiveData<List<Data>> {
-                return Transformations.map(localDataSource.getAllData()) {
-                    DataMapper.mapEntitiesToDomain(it)
-                }
+            override fun loadFromDB(): Flowable<List<Data>> {
+//                return Transformations.map(localDataSource.getAllData()) {
+//                    DataMapper.mapEntitiesToDomain(it)
+//                }
+                return localDataSource.getAllData().map { DataMapper.mapEntitiesToDomain(it) }
             }
 
             override fun shouldFetch(data: List<Data>?): Boolean {
@@ -44,18 +48,21 @@ class DataRepository private constructor(
                 return true
             }
 
-            override fun createCall(): LiveData<ApiResponse<List<DataResponse>>> {
+            override fun createCall(): Flowable<ApiResponse<List<DataResponse>>> {
                 return remoteDataSource.getDataUser()
             }
 
             override fun saveCallResult(data: List<DataResponse>) {
                val list = DataMapper.mapResponsesToEntities(data)
                 localDataSource.insertData(list)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe()
             }
-        }.asLiveData()
+        }.asFlowable()
     }
 
-    override fun getFavoriteData(): LiveData<List<Data>> {
+    override fun getFavoriteData(): Flowable<List<Data>> {
         TODO("Not yet implemented")
     }
 

@@ -10,6 +10,12 @@ import com.example.myandroidproject.core.data.source.remote.network.ApiService
 import com.example.myandroidproject.core.data.source.remote.response.DataResponse
 import com.example.myandroidproject.core.data.source.remote.response.UserResponse
 import com.example.myandroidproject.core.utils.JsonHelper
+import io.reactivex.BackpressureStrategy
+import io.reactivex.Flowable
+import io.reactivex.Scheduler
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.PublishSubject
 import org.json.JSONException
 import retrofit2.Call
 import retrofit2.Callback
@@ -59,23 +65,44 @@ class RemoteDataSource private constructor(private val apiService: ApiService) {
             }
     }
 
-    fun getDataUser(): LiveData<ApiResponse<List<DataResponse>>> {
-        val resultData = MutableLiveData<ApiResponse<List<DataResponse>>>()
+    //get data with retrofit
+//    fun getDataUser(): LiveData<ApiResponse<List<DataResponse>>> {
+//        val resultData = MutableLiveData<ApiResponse<List<DataResponse>>>()
+//
+//        val client = apiService.getDataUser()
+//        client.enqueue(object : Callback<UserResponse?> {
+//            override fun onResponse(call: Call<UserResponse?>, response: Response<UserResponse?>) {
+//                val dataResponse = response.body()?.items
+//                resultData.value = if (dataResponse != null) ApiResponse.Success(dataResponse) else ApiResponse.Empty
+//                Log.e("remotedatasource", response.body().toString())
+//            }
+//
+//            override fun onFailure(call: Call<UserResponse?>, t: Throwable) {
+//                resultData.value = ApiResponse.Error(t.message.toString())
+//                Log.e("remotedatasource", t.message.toString())
+//            }
+//        })
+//        return  resultData
+//    }
+
+    //get data with rx
+    fun getDataUser(): Flowable<ApiResponse<List<DataResponse>>> {
+        val resultData = PublishSubject.create<ApiResponse<List<DataResponse>>>()
 
         val client = apiService.getDataUser()
-        client.enqueue(object : Callback<UserResponse?> {
-            override fun onResponse(call: Call<UserResponse?>, response: Response<UserResponse?>) {
-                val dataResponse = response.body()?.items
-                resultData.value = if (dataResponse != null) ApiResponse.Success(dataResponse) else ApiResponse.Empty
-                Log.e("remotedatasource", response.body().toString())
-            }
+        client.subscribeOn(Schedulers.computation())
+            .observeOn(AndroidSchedulers.mainThread())
+            .take(1)
+            .subscribe({
+                response -> val dataArray = response.items
+                resultData.onNext(if (dataArray.isNotEmpty()) ApiResponse.Success(dataArray) else ApiResponse.Empty)
 
-            override fun onFailure(call: Call<UserResponse?>, t: Throwable) {
-                resultData.value = ApiResponse.Error(t.message.toString())
-                Log.e("remotedatasource", t.message.toString())
-            }
-        })
-        return  resultData
+            }, { error ->
+                resultData.onNext(ApiResponse.Error(error.message.toString()))
+                Log.e("remotedatasource", error.toString())
+            })
+
+        return resultData.toFlowable(BackpressureStrategy.BUFFER)
     }
 }
 
