@@ -10,6 +10,8 @@ import com.example.myandroidproject.core.domain.model.Data
 import com.example.myandroidproject.core.domain.repository.IDataRepository
 import com.example.myandroidproject.core.utils.AppExecutors
 import com.example.myandroidproject.core.utils.DataMapper
+import kotlinx.coroutines.flow.map
+import java.util.concurrent.Flow
 
 class DataRepository private constructor(
     private val remoteDataSource: RemoteDataSource,
@@ -31,31 +33,31 @@ class DataRepository private constructor(
             }
     }
 
-    override fun getAllData(): LiveData<Resource<List<Data>>> {
-        return object : NetworkBoundResource<List<Data>, List<DataResponse>>(appExecutors) {
-            override fun loadFromDB(): LiveData<List<Data>> {
-                return Transformations.map(localDataSource.getAllData()) {
-                    DataMapper.mapEntitiesToDomain(it)
-                }
+    override fun getAllData(): kotlinx.coroutines.flow.Flow<Resource<List<Data>>> {
+        return object : NetworkBoundResource<List<Data>, List<DataResponse>>() {
+            override fun loadFromDB(): kotlinx.coroutines.flow.Flow<List<Data>> {
+//                return Transformations.map(localDataSource.getAllData()) {
+//                    DataMapper.mapEntitiesToDomain(it)
+//                }
+                return localDataSource.getAllData().map { DataMapper.mapEntitiesToDomain(it) }
             }
 
             override fun shouldFetch(data: List<Data>?): Boolean {
-//                return data == null || data.isEmpty()
-                return true
+                return data == null || data.isEmpty()
             }
 
-            override fun createCall(): LiveData<ApiResponse<List<DataResponse>>> {
+            override suspend fun createCall(): kotlinx.coroutines.flow.Flow<ApiResponse<List<DataResponse>>> {
                 return remoteDataSource.getDataUser()
             }
 
-            override fun saveCallResult(data: List<DataResponse>) {
+            override suspend fun saveCallResult(data: List<DataResponse>) {
                val list = DataMapper.mapResponsesToEntities(data)
                 localDataSource.insertData(list)
             }
-        }.asLiveData()
+        }.asFlow()
     }
 
-    override fun getFavoriteData(): LiveData<List<Data>> {
+    override fun getFavoriteData(): kotlinx.coroutines.flow.Flow<List<Data>> {
         TODO("Not yet implemented")
     }
 

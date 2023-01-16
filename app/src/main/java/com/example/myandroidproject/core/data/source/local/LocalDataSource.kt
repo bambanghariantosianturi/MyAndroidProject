@@ -3,6 +3,7 @@ package com.example.myandroidproject.core.data.source.local
 import androidx.lifecycle.LiveData
 import com.example.myandroidproject.core.data.source.local.entity.DataEntity
 import com.example.myandroidproject.core.data.source.local.room.UserDao
+import kotlinx.coroutines.flow.Flow
 
 class LocalDataSource private constructor(private val userDao: UserDao) {
 
@@ -15,11 +16,11 @@ class LocalDataSource private constructor(private val userDao: UserDao) {
             }
     }
 
-    fun getAllData(): LiveData<List<DataEntity>> = userDao.getAllData()
+    fun getAllData(): Flow<List<DataEntity>> = userDao.getAllData()
 
 //    fun getFavoriteData(): LiveData<List<DataEntity>> = userDao.
 
-    fun insertData(dataList: List<DataEntity>) = userDao.insertData(dataList)
+    suspend fun insertData(dataList: List<DataEntity>) = userDao.insertData(dataList)
 
     fun setFavoriteData(data: DataEntity, mState: Boolean) {
 //        data.isfavorite = mState
