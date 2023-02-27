@@ -14,6 +14,8 @@ import org.json.JSONException
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import javax.inject.Inject
+import javax.inject.Singleton
 
 //class RemoteDataSource private constructor(private val jsonHelper: JsonHelper){
 //    companion object {
@@ -48,7 +50,8 @@ import retrofit2.Response
 //    }
 //}
 
-class RemoteDataSource private constructor(private val apiService: ApiService) {
+@Singleton
+class RemoteDataSource @Inject constructor(private val apiService: ApiService) {
     companion object {
         @Volatile
         private var instance: RemoteDataSource? = null

@@ -11,21 +11,21 @@ abstract class UserDatabase : RoomDatabase() {
 
     abstract fun userDao(): UserDao
 
-    companion object {
-        @Volatile
-        private var INSTANCE: UserDatabase? = null
-
-        fun getInstance(context: Context): UserDatabase =
-            INSTANCE ?: synchronized(this) {
-                val instance = Room.databaseBuilder(
-                    context.applicationContext,
-                    UserDatabase::class.java,
-                    "user.db"
-                )
-                    .fallbackToDestructiveMigration()
-                    .build()
-                INSTANCE = instance
-                instance
-            }
-    }
+//    companion object {
+//        @Volatile
+//        private var INSTANCE: UserDatabase? = null
+//
+//        fun getInstance(context: Context): UserDatabase =
+//            INSTANCE ?: synchronized(this) {
+//                val instance = Room.databaseBuilder(
+//                    context.applicationContext,
+//                    UserDatabase::class.java,
+//                    "user.db"
+//                )
+//                    .fallbackToDestructiveMigration()
+//                    .build()
+//                INSTANCE = instance
+//                instance
+//            }
+//    }
 }

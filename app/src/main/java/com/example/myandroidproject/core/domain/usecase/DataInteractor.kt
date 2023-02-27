@@ -4,8 +4,9 @@ import androidx.lifecycle.LiveData
 import com.example.myandroidproject.core.data.Resource
 import com.example.myandroidproject.core.domain.model.Data
 import com.example.myandroidproject.core.domain.repository.IDataRepository
+import javax.inject.Inject
 
-class DataInteractor (private val dataRepository: IDataRepository): DataUseCase {
+class DataInteractor @Inject constructor (private val dataRepository: IDataRepository): DataUseCase {
     override fun getAllData(): LiveData<Resource<List<Data>>> {
         return dataRepository.getAllData()
     }

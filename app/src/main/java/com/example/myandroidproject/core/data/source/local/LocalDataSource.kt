@@ -3,17 +3,20 @@ package com.example.myandroidproject.core.data.source.local
 import androidx.lifecycle.LiveData
 import com.example.myandroidproject.core.data.source.local.entity.DataEntity
 import com.example.myandroidproject.core.data.source.local.room.UserDao
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class LocalDataSource private constructor(private val userDao: UserDao) {
+@Singleton
+class LocalDataSource @Inject constructor(private val userDao: UserDao) {
 
-    companion object {
-        private var instance: LocalDataSource? = null
-
-        fun getInstance(userDao: UserDao): LocalDataSource =
-            instance ?: synchronized(this) {
-                instance ?: LocalDataSource(userDao)
-            }
-    }
+//    companion object {
+//        private var instance: LocalDataSource? = null
+//
+//        fun getInstance(userDao: UserDao): LocalDataSource =
+//            instance ?: synchronized(this) {
+//                instance ?: LocalDataSource(userDao)
+//            }
+//    }
 
     fun getAllData(): LiveData<List<DataEntity>> = userDao.getAllData()
 
