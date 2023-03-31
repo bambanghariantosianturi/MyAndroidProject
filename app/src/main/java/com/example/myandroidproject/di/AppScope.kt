@@ -1,7 +1,7 @@
-package com.example.myandroidproject.di
-
-import javax.inject.Scope
-
-@Scope
-@Retention(AnnotationRetention.RUNTIME)
-annotation class AppScope
+//package com.example.myandroidproject.di
+//
+//import javax.inject.Scope
+//
+//@Scope
+//@Retention(AnnotationRetention.RUNTIME)
+//annotation class AppScope

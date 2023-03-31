@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.example.myandroidproject.core.data.Resource
 import com.example.myandroidproject.core.domain.model.Data
+import com.example.myandroidproject.core.domain.model.genremoviemodel.GenreItemModel
+import com.example.myandroidproject.core.domain.model.listmoviesmodel.MovieItemModel
 import com.example.myandroidproject.core.domain.usecase.DataUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -18,7 +20,11 @@ class MainViewModel @Inject constructor(private val dataUseCase: DataUseCase) : 
 //        _message.value = messageUseCase.getMessage(name)
 //    }
 
-    override fun getAllData(): LiveData<Resource<List<Data>>> {
-        return dataUseCase.getAllData() as LiveData<Resource<List<Data>>>
+    override fun getAllData(page: Int, genreId: Int): LiveData<Resource<List<MovieItemModel>>> {
+        return dataUseCase.getAllData(page, genreId)
+    }
+
+    override fun getGenreMovie(): LiveData<Resource<List<GenreItemModel>>> {
+        return dataUseCase.getGenreMovie()
     }
 }

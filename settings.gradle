@@ -14,3 +14,8 @@
 //}
 rootProject.name = "MyAndroidProject"
 include ':app'
+include ':core'
+include ':test'
+include ':kit'
+include ':detail'
+include ':list'
